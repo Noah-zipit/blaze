@@ -14,11 +14,15 @@ compatibility_date = "2026-09-01"
 directory = "public"
 
 [durable_objects]
-bindings = [
-  { name = "GAME_ROOM", class_name = "GameRoom" },
-  { name = "ROOM_REGISTRY", class_name = "RoomRegistry" },
-]
+
+[[durable_objects.bindings]]
+name = "GAME_ROOM"
+class_name = "GameRoom"
+
+[[durable_objects.bindings]]
+name = "ROOM_REGISTRY"
+class_name = "RoomRegistry"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["GameRoom", "RoomRegistry"]
+new_sqlite_classes = ["GameRoom", "RoomRegistry"]
