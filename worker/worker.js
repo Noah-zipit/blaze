@@ -63,7 +63,26 @@ export default {
       return stub.fetch(new Request(doUrl, request));
     }
 
-    // Everything else: the static game client.
-    return env.ASSETS.fetch(request);
+    // Everything else: the static game client. Missing assets get the
+    // branded 404 page (never a bare 500).
+    try {
+      const res = await env.ASSETS.fetch(request);
+      if (res.status === 404) return notFound(env);
+      return res;
+    } catch {
+      return notFound(env);
+    }
   },
 };
+
+async function notFound(env) {
+  try {
+    const res = await env.ASSETS.fetch(new Request('https://assets/404.html'));
+    return new Response(res.body, {
+      status: 404,
+      headers: { 'content-type': 'text/html; charset=UTF-8', 'cache-control': 'public, max-age=3600' },
+    });
+  } catch {
+    return new Response('Not found', { status: 404 });
+  }
+}

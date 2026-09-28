@@ -1,0 +1,8 @@
+# Blaze — Arena FPS
+
+> Mobile-first browser arena FPS. Solo vs AI soldiers, or live 5-minute multiplayer deathmatch rooms. No install, no sign-up — pick a callsign and play.
+
+- Live game: https://blaze.itzash110099-e54.workers.dev/
+- How to play: enter a callsign, pick a loadout (Assault Rifle / SMG / Sniper), press PLAY for solo vs 2 AI soldiers, or CREATE/JOIN a room for live multiplayer (Sector 04, 5:00 rounds, auto respawn).
+- Controls: WASD + mouse, Space = jump, C = slide, Esc = pause. Touch controls on mobile.
+- Tech: Three.js client, Cloudflare Workers + Durable Objects multiplayer backend.
