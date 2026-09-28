@@ -1,4 +1,5 @@
 /* Blaze audio — 100% synthesized SFX (ported verbatim from the approved demo). */
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const AudioSynth = {
   ctx: null, master: null, muted: false, volume: 0.9,
   ensure() {

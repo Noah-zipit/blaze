@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 <title>Blaze — Arena FPS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -225,5 +231,45 @@
 </div>
 
 <script type="module" src="./js/main.js"></script>
+<script>
+/* Boot diagnostics: surface module load/runtime errors on screen (no console needed). */
+(function () {
+  var log = [];
+  function render() {
+    var el = document.getElementById('boot-log');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'boot-log';
+      el.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99999;max-width:94vw;'
+        + 'background:rgba(10,10,12,.92);color:#ffe14d;font:11px/1.5 monospace;'
+        + 'padding:8px 10px;border:1px solid #ffe14d;border-radius:8px;'
+        + 'white-space:pre-wrap;word-break:break-all;pointer-events:none;';
+      (document.body || document.documentElement).appendChild(el);
+    }
+    el.textContent = log.join('\n');
+    el.style.display = log.length ? 'block' : 'none';
+  }
+  window.__bootLog = log;
+  window.__bootRender = render;
+  window.__bootNote = function (msg, ttlMs) {
+    log.push(msg); render();
+    if (ttlMs) setTimeout(function () {
+      var i = log.indexOf(msg);
+      if (i >= 0 && !log.some(function (x) { return x.indexOf('ERR:') === 0 || x.indexOf('REJ:') === 0; })) {
+        log.splice(i, 1); render();
+      }
+    }, ttlMs);
+  };
+  window.addEventListener('error', function (e) {
+    log.push('ERR: ' + (e.message || e.type) + ' @' + (e.filename || '?') + ':' + (e.lineno || '?'));
+    render();
+  }, true);
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason;
+    log.push('REJ: ' + (r && (r.stack || r.message)) || String(r));
+    render();
+  });
+})();
+</script>
 </body>
 </html>

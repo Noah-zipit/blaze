@@ -47,8 +47,7 @@ function saveSettings() {
   localStorage.setItem('blaze_quality', Quality.current); // legacy key, kept in sync
 }
 
-/* ================= AUDIO (100% synthesized) ================= */
-}
+/* ================= AUDIO (100% synthesized — see js/audio.js) ================= */
 
 /* ================= GAME STATE ================= */
 let mode = 'home'; // home | playing | ended
@@ -799,7 +798,7 @@ function respawnPlayer(pos) {
   buildViewmodel(loadoutKey); // FPS viewmodel gun for the current loadout
   playerPos.copy(pos || SPAWNS[0]); playerVel.set(0, 0, 0); vy = 0; grounded = true;
   sliding = false; slideT = 0; slideCdUntil = 0;
-  yaw = Math.atan2(-playerPos.x, -playerPos.z); pitch = 0;
+  yaw = Math.atan2(playerPos.x, playerPos.z); pitch = 0;
   hp = 100; alive = true; ammo = WEAPONS[loadoutKey].mag; reloading = false;
   rlMoveT = 0;
   spawnStamp = matchElapsed;   // loadout locked for 5s from here
@@ -989,8 +988,9 @@ document.querySelectorAll('#map-row .map-card').forEach((c) => {
 updateDeployLabel();
 function validUsername(v) { return /^[A-Za-z0-9_]{1,16}$/.test(v); }
 $('btn-play').onclick = async () => {
+  try { window.__bootNote && window.__bootNote('TAP: play handler entered', 3000); } catch (e) {}
   AudioSynth.ensure(); AudioSynth.uiClick();
-  if (!readUsername()) return;
+  if (!readUsername()) { try { window.__bootNote && window.__bootNote('TAP: callsign rejected', 3000); } catch (e) {} return; }
   goFullscreen();
   try {
     if (IS_TOUCH && screen.orientation && screen.orientation.lock) {
@@ -1070,6 +1070,11 @@ document.addEventListener('visibilitychange', () => { tabHidden = document.hidde
 
 
 /* ================= MULTIPLAYER (Cloudflare Worker + Durable Objects) ================= */
+/* ---- boot marker: proves the module executed fully and PLAY was wired ---- */
+try {
+  window.__bootNote && window.__bootNote(
+    'READY: module OK, play=' + (typeof ($('btn-play') && $('btn-play').onclick)), 5000);
+} catch (e) { /* diagnostics must never break boot */ }
 const net = new Net();
 let playMode = 'solo'; // 'solo' | 'multi'
 let myId = null, roomCode = '', mySpawn = null, endsAt = 0;

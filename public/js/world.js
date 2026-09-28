@@ -711,3 +711,4 @@ export function updateParticles(now, dt) {
     p.s.position.addScaledVector(p.vel, dt);
     p.s.material.opacity = clamp((p.until - now) / 400, 0, 1);
   }
+}
