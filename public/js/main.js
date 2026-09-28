@@ -522,6 +522,8 @@ $('btn-mute').onclick = () => { audio.ensure(); toggleMute(); };
 
 /* ================= match flow ================= */
 async function startMatch(rematch = false) {
+  // pendingRoom '' = create; on rematch reuse the same code.
+  const room = rematch && roomCode ? roomCode : pendingRoom;
   if (rematch) {
     try { net.leave(); } catch { /* noop */ }
     await new Promise((r) => setTimeout(r, 350)); // let the leave flush
@@ -531,7 +533,9 @@ async function startMatch(rematch = false) {
   }
   mode = 'connecting';
   if (!net.connected) {
-    try { await net.connect(); }
+    // Room/identity go in the WS URL query so the Workers backend can route
+    // to the room's Durable Object; the join message stays authoritative.
+    try { await net.connect(room, username, loadoutKey); }
     catch {
       $('connecting').classList.add('hidden');
       $('loadout-error').textContent = 'Could not reach server';
@@ -539,8 +543,6 @@ async function startMatch(rematch = false) {
       return;
     }
   }
-  // pendingRoom '' = create; on rematch reuse the same code.
-  const room = rematch && roomCode ? roomCode : pendingRoom;
   if (!rematch) { show('game'); $('connecting').classList.remove('hidden'); }
   net.join(room, username, loadoutKey);
 }

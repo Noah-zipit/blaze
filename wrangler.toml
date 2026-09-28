@@ -1,0 +1,24 @@
+# Blaze on Cloudflare Workers — wrangler config.
+#
+# Free tier, no credit card: Workers free plan includes Durable Objects.
+# DOs on the free tier use SQLite storage only (fine — rooms are ephemeral;
+# the roster is persisted so a room survives isolate eviction).
+# Workers never "sleep": no keep-warm ping is needed, unlike Render/Koyeb.
+
+name = "blaze"
+main = "worker/worker.js"
+compatibility_date = "2026-09-01"
+
+# Static game client served from the edge.
+[assets]
+directory = "public"
+
+[durable_objects]
+bindings = [
+  { name = "GAME_ROOM", class_name = "GameRoom" },
+  { name = "ROOM_REGISTRY", class_name = "RoomRegistry" },
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["GameRoom", "RoomRegistry"]

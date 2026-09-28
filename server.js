@@ -51,6 +51,10 @@ app.get('/health', (req, res) => {
 });
 
 const server = http.createServer(app);
+// Note: constructed without a `path` filter, so the ws server accepts
+// upgrades on every path — both `/` (legacy client) and `/ws` (the route
+// the Cloudflare Workers backend uses). Local dev works with the same
+// client either way.
 const wss = new WebSocketServer({ server, maxPayload: MAX_PAYLOAD_BYTES + 64 });
 
 let nextPlayerId = 1;

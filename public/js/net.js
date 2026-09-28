@@ -19,10 +19,16 @@ export class Net {
     if (set) for (const fn of set) { try { fn(data); } catch (e) { console.error('[net] handler error', e); } }
   }
 
-  connect() {
+  // Connects to the game backend. Room/username/loadout ride in the query
+  // string so the Cloudflare Worker can route /ws to the right Durable
+  // Object before any message is sent; the `join` message below still
+  // carries the authoritative fields, so the Node server (server.js) and
+  // the Worker backend accept the same client. `room` '' = create.
+  connect(room = '', username = '', loadout = 'rifle') {
     return new Promise((resolve, reject) => {
       const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const ws = new WebSocket(`${proto}//${location.host}`);
+      const q = new URLSearchParams({ room, username, loadout }).toString();
+      const ws = new WebSocket(`${proto}//${location.host}/ws?${q}`);
       const timeout = setTimeout(() => { ws.close(); reject(new Error('connect timeout')); }, 8000);
       ws.onopen = () => { clearTimeout(timeout); this.connected = true; resolve(); };
       ws.onerror = () => { clearTimeout(timeout); reject(new Error('websocket error')); };
