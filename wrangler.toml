@@ -6,6 +6,7 @@
 # Workers never "sleep": no keep-warm ping is needed, unlike Render/Koyeb.
 
 name = "blaze"
+account_id = "e5412bc12dc3c405ce91578e9b385925"
 main = "worker/worker.js"
 compatibility_date = "2026-09-01"
 
